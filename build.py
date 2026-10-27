@@ -72,7 +72,7 @@ def card(code: str, med: dict) -> str:
 <div class="who"><b>{html.escape(x["user_name"])}</b> · {ago(x["taken_at"])}</div>
 <div class="nums">👁 {num(x["views"])} &nbsp; ❤️ {num(x["likes"])} &nbsp; 💬 {num(x["comments"])}</div>
 {boost}
-<blockquote class="instagram-media" data-instgrm-permalink="{url}" data-instgrm-version="14"><a href="{url}">Mira el vídeo a Instagram</a></blockquote>
+<button class="slot" data-embed="{url}embed/" aria-label="Mira el vídeo"><img src="img/{code}.jpg" alt="" loading="lazy"><span class="play">▶</span></button>
 <a class="open" href="{url}">Obrir a Instagram ↗</a>
 </div>'''
 
