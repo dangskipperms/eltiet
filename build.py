@@ -84,7 +84,7 @@ def card(code: str, med: dict) -> str:
 <div class="who"><b>{html.escape(x["user_name"])}</b> · {followers(x["user"])} · {ago(x["taken_at"])}</div>
 <div class="nums">❤️ {num(x["likes"])} &nbsp; 💬 {num(x["comments"])} &nbsp; <span class="views">👁 {num(x["views"])}</span></div>
 {boost}
-<button class="slot" data-embed="{url}embed/" aria-label="Mira el vídeo"><img src="img/{code}.jpg" alt="" loading="lazy"><span class="play">▶</span></button>
+<video class="clip" src="vid/{code}.mp4" poster="img/{code}.jpg" controls playsinline preload="none"></video>
 <a class="open" href="{url}">Obrir a Instagram ↗</a>
 </div>'''
 
