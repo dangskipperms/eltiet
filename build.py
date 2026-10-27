@@ -17,36 +17,36 @@ TODAY = date(2026, 10, 27)
 FORMATS = [
     ("👨‍🍳", "El xef explica la recepta d'un clàssic",
      "El cuiner, a càmera, ensenya com fa un plat de tota la vida. La gent el desa i el comenta.",
-     ["Dbp-AbSsdaQ", "DaUc5IIsFOE"],
+     ["DaUc5IIsFOE", "DZX6NT8oikL", "DdtWJnzM259"],
      "L'Iván explica en 30 segons com fa un plat seu: el suquet, un guisat, el que vulgui. En català, amb la seva gràcia."),
-    ("🔥", "El foc i el producte, molt de prop",
-     "Res més: la brasa, el plat que es fa, el so. Senzill i molt vist.",
-     ["DaViLpXsvrO", "DeFE5Gkg2xd", "Db3HaHEhehL"],
+    ("🔥", "El plat i el foc, molt de prop",
+     "Res més: la brasa, el plat que es fa, el so. Senzill.",
+     ["Dc1F3cmFNdw", "Db3HaHEhehL", "DeuYpYvxGp9"],
      "La brasa, el bufador, la salsa que bull, molt a prop, amb el so real. El suquet d'avui ja és d'aquest tipus."),
-    ("🍷", "Un plat i el seu vi",
-     "Un plat, una copa, un nom de vi. Ajuda a decidir què demanar.",
-     ["Db8mb5ZtFLc"],
-     "Un plat de la carta i el vi que hi recomaneu, servit a taula."),
-    ("✨", "Tot el restaurant en un vídeo",
-     "15 segons de servei: sala plena, cuina, plats que surten. Fa venir ganes d'anar-hi.",
-     ["DakiZU2Dk_b"],
-     "Un vespre de servei: la sala, la cuina, els plats sortint, l'equip rient. Clips curts, molts."),
     ("📺", "Una sèrie per capítols",
      "«Capítol 1», «Capítol 2»... La gent torna per veure el següent.",
      ["Dbs_kTpkfXJ"],
      "«El producte de la setmana»: cada setmana un producte que compra l'Iván, del mercat al plat."),
+    ("👥", "L'equip, a la cuina per dins",
+     "Les persones que hi ha darrere dels plats. Fa proper el restaurant.",
+     ["Dak5aiUEyxe", "DYzmcWZjxBB"],
+     "Un matí a la cuina d'El Tiet: l'Iván, la Bea, la preparació. Clips curts, sense posar."),
+    ("🥂", "Els clients de sempre",
+     "Un client de tota la vida explica per què torna. Genera confiança.",
+     ["Daa5Y5FtCaH", "DbtL_rys3st"],
+     "Un client fidel, 20 segons a càmera: què demana sempre i per què."),
     ("📱", "Un creador de menjar us visita",
-     "El que fa més visualitzacions de tot: un creador que dina al restaurant. Aquest és a Mallorca 250, a cinc minuts d'El Tiet.",
+     "El que fa més m'agrada de tot: un creador que dina al restaurant. Aquest és a Mallorca 250, a cinc minuts d'El Tiet.",
      ["De6aBA4ukSm"],
      "Convidar a dinar un creador de menjar de Barcelona. Us busquem els que encaixen."),
 ]
 
-
-def median_views() -> dict[str, float]:
+def median_likes() -> dict[str, float]:
+    # Likes, not views: views can be bought with ads, likes come from people who liked it.
     per = defaultdict(list)
     for x in SCOUT.values():
-        if x.get("kind") == "clips" and x.get("views"):
-            per[x["user"]].append(x["views"])
+        if x.get("kind") == "clips" and x.get("likes") is not None:
+            per[x["user"]].append(x["likes"])
     return {u: statistics.median(v) for u, v in per.items() if len(v) >= 5}
 
 
@@ -66,11 +66,11 @@ def num(n: int) -> str:
 def card(code: str, med: dict) -> str:
     x = SCOUT[code]
     url = f"https://www.instagram.com/reel/{code}/"
-    times = x["views"] / med[x["user"]] if x["user"] in med else None
-    boost = f'<div class="boost">{round(times)} vegades més vist que els seus vídeos normals</div>' if times and times >= 2 else ""
+    times = x["likes"] / med[x["user"]] if med.get(x["user"]) else None
+    boost = f'<div class="boost">{round(times)} vegades més m\'agrada que els seus vídeos normals</div>' if times and times >= 2 else ""
     return f'''<div class="reel">
 <div class="who"><b>{html.escape(x["user_name"])}</b> · {ago(x["taken_at"])}</div>
-<div class="nums">👁 {num(x["views"])} &nbsp; ❤️ {num(x["likes"])} &nbsp; 💬 {num(x["comments"])}</div>
+<div class="nums">❤️ {num(x["likes"])} &nbsp; 💬 {num(x["comments"])} &nbsp; <span class="views">👁 {num(x["views"])}</span></div>
 {boost}
 <button class="slot" data-embed="{url}embed/" aria-label="Mira el vídeo"><img src="img/{code}.jpg" alt="" loading="lazy"><span class="play">▶</span></button>
 <a class="open" href="{url}">Obrir a Instagram ↗</a>
@@ -78,7 +78,7 @@ def card(code: str, med: dict) -> str:
 
 
 def main() -> None:
-    med = median_views()
+    med = median_likes()
     blocks = []
     for i, (icon, title, why, codes, ask) in enumerate(FORMATS, 1):
         reels = "\n".join(card(c, med) for c in codes)
