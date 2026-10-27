@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build index.html, Elena's page of the 2026 Reels that work for Barcelona restaurants, from ../research/scout.json."""
+"""Build index.html, The restaurant's page of the 2026 Reels that work for Barcelona restaurants, from ../research/scout.json."""
 from __future__ import annotations
 
 import html
