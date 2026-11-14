@@ -10,6 +10,15 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 RAW = HERE.parent / "research" / "raw-reels"
+SCOUT = json.loads((HERE.parent / "research" / "scout.json").read_text())
+
+
+def numbers(code):
+    """Views, likes, comments and the day posted, as the search saved them. Under ten likes is a hidden count: left out."""
+    s = SCOUT.get(code, {})
+    likes = s.get("likes")
+    return {"views": s.get("views"), "likes": likes if likes is not None and likes >= 10 else None,
+            "comments": s.get("comments"), "date": s.get("taken_at")}
 
 
 def media(code):
@@ -27,7 +36,7 @@ def media(code):
 def main(slug):
     d = HERE / "llista" / slug
     L = json.loads((d / "list.json").read_text())
-    items = [{"code": i["code"], "line": i["line"], "x": i.get("x", ""), "url": f"https://www.instagram.com/reel/{i['code']}/"}
+    items = [{"code": i["code"], "line": i["line"], "x": i.get("x", ""), "url": f"https://www.instagram.com/reel/{i['code']}/", **numbers(i["code"])}
              for i in L["items"]]
     for i in items:
         media(i["code"])
