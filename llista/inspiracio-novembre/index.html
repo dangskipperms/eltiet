@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000">
+<title>El Tiet · Per inspirar-te</title>
+<!-- Built by llista.py from llista/inspiracio-novembre/list.json. Edit the template, never the built page. -->
+<style>
+:root{--bg:#fbf6f1;--fg:#2b1a14;--muted:#8a7468;--red:#780e00;--card:#fff;--line:#eadccf}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17110e;--fg:#f3e9e1;--muted:#a99486;--red:#ff8a73;--card:#241a15;--line:#3a2c24}}
+:root[data-theme="dark"]{--bg:#17110e;--fg:#f3e9e1;--muted:#a99486;--red:#ff8a73;--card:#241a15;--line:#3a2c24}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.35 -apple-system,system-ui,"Helvetica Neue",sans-serif}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+
+/* The list */
+#list{max-width:640px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 16px 48px}
+header{display:flex;gap:14px;align-items:center;margin-bottom:18px}
+header img{width:58px;height:58px;flex:none}
+h1{font-size:24px;line-height:1.15;margin:0 0 4px}
+header p{margin:0;color:var(--muted);font-size:15px}
+.play-all{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;margin:0 0 18px;
+  border-radius:14px;background:var(--red);color:#fff;font-weight:700;font-size:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
+.item{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;text-align:left}
+.cover{position:relative;aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:#000}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover::after{content:"";position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.badge{position:absolute;left:8px;bottom:8px;z-index:1;color:#fff;font-weight:800;font-size:22px;font-variant-numeric:tabular-nums;
+  text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.tri{position:absolute;right:9px;bottom:10px;z-index:1;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.9);
+  display:grid;place-items:center}
+.tri::before{content:"";margin-left:3px;border-style:solid;border-width:7px 0 7px 11px;border-color:transparent transparent transparent #000}
+.item p{margin:7px 2px 0;font-size:14px;line-height:1.3}
+.seen .cover{opacity:.55}
+.seen .badge::after{content:"  ✓ vist";font-size:13px;font-weight:600}
+.how{margin:24px 2px 0;color:var(--muted);font-size:14px}
+
+/* The viewer: one video, the whole screen */
+#viewer{position:fixed;inset:0;z-index:10;background:#000;color:#fff;display:none;touch-action:none;overscroll-behavior:none}
+#viewer.on{display:block}
+#v{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.top{position:absolute;left:0;right:0;top:0;padding:calc(10px + env(safe-area-inset-top)) 12px 18px;display:flex;align-items:center;gap:10px;
+  background:linear-gradient(rgba(0,0,0,.55),transparent)}
+.back{padding:8px 14px;border-radius:20px;background:rgba(0,0,0,.45);font-size:16px;font-weight:600}
+.count{margin-left:auto;font-size:15px;font-variant-numeric:tabular-nums;opacity:.9}
+.bar{position:absolute;left:0;right:0;top:0;height:3px;background:rgba(255,255,255,.2)}
+.bar i{display:block;height:100%;width:0;background:#fff}
+.bottom{position:absolute;left:0;right:0;bottom:0;padding:40px 16px calc(14px + env(safe-area-inset-bottom));
+  background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.big{font-size:34px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.big small{font-size:14px;font-weight:600;opacity:.85;margin-left:6px}
+.line{margin:6px 0 12px;font-size:17px;max-width:30em}
+.row{display:flex;gap:10px;align-items:center}
+.next{flex:1;padding:14px;border-radius:14px;background:#fff;color:#000;font-weight:700;font-size:17px}
+.prev{padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.18);font-weight:700}
+.ig{display:inline-block;margin-top:10px;color:#fff;opacity:.75;font-size:14px}
+.paused{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;background:rgba(0,0,0,.45);
+  display:none;place-items:center}
+.paused::before{content:"";margin-left:6px;border-style:solid;border-width:16px 0 16px 26px;border-color:transparent transparent transparent #fff}
+#viewer.is-paused .paused{display:grid}
+.hint{position:absolute;left:0;right:0;top:42%;text-align:center;font-size:15px;opacity:0;transition:opacity .4s;pointer-events:none}
+.hint.show{opacity:.9}
+</style>
+</head>
+<body>
+
+<main id="list">
+  <header>
+    <img src="../../img/logo.svg" alt="El Tiet">
+    <div>
+      <h1>Per inspirar-te</h1>
+      <p>Vídeos de restaurants que han funcionat molt. Toca&#x27;n un i mira&#x27;l.</p>
+    </div>
+  </header>
+  <button class="play-all" id="playAll">▶ Mirar-los tots, un darrere l'altre</button>
+  <div class="grid" id="grid"></div>
+  <p class="how" >El número ×: quantes vegades més visites que seguidors té el compte. ×100 vol dir que el va veure cent vegades més gent que la que el segueix.</p>
+</main>
+
+<section id="viewer" aria-label="Vídeo">
+  <video id="v" playsinline preload="auto"></video>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="top">
+    <button class="back" id="back">✕ Llista</button>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="paused"></div>
+  <div class="hint" id="hint">Llisca cap amunt per al següent</div>
+  <div class="bottom">
+    <div class="big" id="big"></div>
+    <div class="line" id="line"></div>
+    <div class="row">
+      <button class="prev" id="prev" aria-label="Anterior">↑</button>
+      <button class="next" id="next">Següent ↓</button>
+    </div>
+    <a class="ig" id="ig" target="_blank" rel="noopener">Obrir a Instagram ↗</a>
+  </div>
+</section>
+
+<script>
+const VID = "../../vid/", IMG = "../../img/", KEY = "seen:inspiracio-novembre";
+const $ = id => document.getElementById(id);
+const esc = t => t.replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
+const v = $("v");
+const R = [{"code": "Ddy_LZKh9_s", "line": "Una planxa bruta que queda com un mirall en vuit minuts.", "x": "×1185", "url": "https://www.instagram.com/reel/Ddy_LZKh9_s/"}, {"code": "DemcJG8MGn9", "line": "Un magret d'ànec emplatat de prop.", "x": "×567", "url": "https://www.instagram.com/reel/DemcJG8MGn9/"}, {"code": "DdPHA7jSn9a", "line": "Un cuiner amb una sola mà neteja la planxa.", "x": "×565", "url": "https://www.instagram.com/reel/DdPHA7jSn9a/"}, {"code": "DcLyaaJIB6u", "line": "Una patata tallada en una sola cinta llarguíssima.", "x": "×529", "url": "https://www.instagram.com/reel/DcLyaaJIB6u/"}, {"code": "DfFAUCSubLn", "line": "Un pastís de formatge decorat amb punts de salsa.", "x": "×222", "url": "https://www.instagram.com/reel/DfFAUCSubLn/"}, {"code": "DdoSxd6I4pr", "line": "Cors de salsa dibuixats al plat amb una màniga.", "x": "×184", "url": "https://www.instagram.com/reel/DdoSxd6I4pr/"}, {"code": "DdhEYOioaXf", "line": "Un «truc de xef»: un niu fregit dins un cèrcol. 14 segons.", "x": "×144", "url": "https://www.instagram.com/reel/DdhEYOioaXf/"}, {"code": "Dd0yyl9oL93", "line": "Un restaurant d'Oslo: un plat nou del menú de grups.", "x": "×136", "url": "https://www.instagram.com/reel/Dd0yyl9oL93/"}, {"code": "DcyTU-3IuYj", "line": "El restaurant de Huelva: tots els plats que surten en 30 minuts.", "x": "×99", "url": "https://www.instagram.com/reel/DcyTU-3IuYj/"}, {"code": "De_IJyuOCRZ", "line": "Un restaurant de Marsella: una ceba tallada d'una manera estranya.", "x": "×84", "url": "https://www.instagram.com/reel/De_IJyuOCRZ/"}, {"code": "DcyfrR2i_6H", "line": "L'ampolla d'oli que sempre regalima: un tros de film a la rosca.", "x": "×76", "url": "https://www.instagram.com/reel/DcyfrR2i_6H/"}, {"code": "DePhpo6IW_s", "line": "Un restaurant petit anglès: el seu hummus nou, en 14 segons.", "x": "×60", "url": "https://www.instagram.com/reel/DePhpo6IW_s/"}, {"code": "DekBu1ARzVA", "line": "Un cuiner explica l'oli fumat «que molts restaurants no t'expliquen», mentre el fa.", "x": "×52", "url": "https://www.instagram.com/reel/DekBu1ARzVA/"}, {"code": "DeILn-upueS", "line": "Un restaurant de Mèxic: els plats d'una celebració, un per un.", "x": "×49", "url": "https://www.instagram.com/reel/DeILn-upueS/"}, {"code": "Dcr3a2fBHq7", "line": "Paper d'arròs que s'infla a l'oli i fa de closca.", "x": "×45", "url": "https://www.instagram.com/reel/Dcr3a2fBHq7/"}, {"code": "DdHN1ppti8n", "line": "Una pàgina petita entra a la cuina del TRÜ, a l'Eixample. Els dos amos ho expliquen.", "x": "×42", "url": "https://www.instagram.com/reel/DdHN1ppti8n/"}, {"code": "DdzUBsnPm6p", "line": "Porro cruixent: escaldar, gel, fregir. Una paraula a la pantalla per pas.", "x": "×39", "url": "https://www.instagram.com/reel/DdzUBsnPm6p/"}, {"code": "DdOJDW_gAim", "line": "L'última cullerada de salsa sobre vuit plats.", "x": "×37", "url": "https://www.instagram.com/reel/DdOJDW_gAim/"}, {"code": "DccvRBFPbmo", "line": "Sis maneres de posar un puré al plat, numerades.", "x": "×32", "url": "https://www.instagram.com/reel/DccvRBFPbmo/"}, {"code": "DflIKgIxh1S", "line": "Com s'agafa el ganivet, picant herbes.", "x": "×31", "url": "https://www.instagram.com/reel/DflIKgIxh1S/"}, {"code": "DdWXEBIICra", "line": "El restaurant de Huelva: el seu tàrtar de llonganissa.", "x": "×31", "url": "https://www.instagram.com/reel/DdWXEBIICra/"}, {"code": "DceQENRoQ-5", "line": "Un cuiner jove explica un tàrtar de tomàquet, del principi al plat.", "x": "×31", "url": "https://www.instagram.com/reel/DceQENRoQ-5/"}, {"code": "DeHzsGpRs8P", "line": "Un xef gallec, assegut: «Mai beguis vi negre amb formatge, t'explico per què.»", "x": "×28", "url": "https://www.instagram.com/reel/DeHzsGpRs8P/"}, {"code": "DdEmumShBAP", "line": "Una salsa clàssica francesa, només mans, cada pas escrit.", "x": "×27", "url": "https://www.instagram.com/reel/DdEmumShBAP/"}, {"code": "Dd9mhfJRyMv", "line": "Un tall en ple servei i els remeis de la cuina.", "x": "×26", "url": "https://www.instagram.com/reel/Dd9mhfJRyMv/"}, {"code": "DecYYVJRTVs", "line": "El mateix xef: quatre costums de cuina amb estrella que pots fer a casa.", "x": "×26", "url": "https://www.instagram.com/reel/DecYYVJRTVs/"}, {"code": "DcJNAWPoFMV", "line": "El que pensa del «Joc de Cartes».", "x": "×23", "url": "https://www.instagram.com/reel/DcJNAWPoFMV/"}, {"code": "DcORnpyIp62", "line": "L'amo i un amic anuncien el seu Nadal, parlant al menjador.", "x": "×21", "url": "https://www.instagram.com/reel/DcORnpyIp62/"}, {"code": "DeechKREVJm", "line": "L'amo d'un restaurant de Huelva ensenya tiquets de veritat: «diuen que som cars, mireu».", "x": "×20", "url": "https://www.instagram.com/reel/DeechKREVJm/"}, {"code": "DcYfpjnthLe", "line": "El matí d'un restaurant, amb el rellotge a la pantalla.", "x": "×18", "url": "https://www.instagram.com/reel/DcYfpjnthLe/"}, {"code": "Dcc6eZ7oBsl", "line": "Llegeix les ressenyes de Google en veu alta i les contesta.", "x": "×17", "url": "https://www.instagram.com/reel/Dcc6eZ7oBsl/"}, {"code": "DeaSmcVuSIU", "line": "Set errors que fem amb la pasta.", "x": "×17", "url": "https://www.instagram.com/reel/DeaSmcVuSIU/"}, {"code": "DdESZErInok", "line": "El mateix amo talla pernil i explica com, després de 25 anys.", "x": "×15", "url": "https://www.instagram.com/reel/DdESZErInok/"}, {"code": "De4L9lhMJee", "line": "Un xef català va a Agramunt a veure com fan els panellets.", "x": "×12", "url": "https://www.instagram.com/reel/De4L9lhMJee/"}, {"code": "DdHN8JNMvRR", "line": "Un pintxo de xistorra, el 14 d'una sèrie de 50. Primer el mossega, després el fa.", "x": "×11", "url": "https://www.instagram.com/reel/DdHN8JNMvRR/"}, {"code": "DdoXy-0IRNS", "line": "El cap de cuina neteja un peix i ho explica.", "x": "×9,7", "url": "https://www.instagram.com/reel/DdoXy-0IRNS/"}, {"code": "DfXaTTQgBkB", "line": "Una cuina tailandesa: l'all pelat d'un sol cop.", "x": "×9,0", "url": "https://www.instagram.com/reel/DfXaTTQgBkB/"}, {"code": "DeruqO-slsj", "line": "Un xef català: «Hem de perdre la por a fer panellets a casa».", "x": "×5,6", "url": "https://www.instagram.com/reel/DeruqO-slsj/"}, {"code": "DeuYpYvxGp9", "line": "L'Esmolet de Badalona: el seu fricandó.", "x": "×5,3", "url": "https://www.instagram.com/reel/DeuYpYvxGp9/"}, {"code": "DcmMD0RRQEU", "line": "«No compris mai brou de pollastre, t'explico per què.»", "x": "×5,2", "url": "https://www.instagram.com/reel/DcmMD0RRQEU/"}, {"code": "DcfmppiItzo", "line": "20 kg de tripa i la seva veu, en català, dient com es fa.", "x": "×4,6", "url": "https://www.instagram.com/reel/DcfmppiItzo/"}, {"code": "DcY0XkyIedN", "line": "Croquetes de gambes a l'allet, cada pas amb subtítols.", "x": "×4,1", "url": "https://www.instagram.com/reel/DcY0XkyIedN/"}, {"code": "Dew5SXFhP1j", "line": "Un xef català: fricandó, «un dels guisats més fàcils».", "x": "×3,7", "url": "https://www.instagram.com/reel/Dew5SXFhP1j/"}, {"code": "DdtWJnzM259", "line": "El Racó d'en Binu: el xef dona la recepta del civet de llebre, en català.", "x": "×2,5", "url": "https://www.instagram.com/reel/DdtWJnzM259/"}];
+let at = 0, lastT = 0;
+const seen = new Set(JSON.parse((() => { try { return localStorage.getItem(KEY) || "[]"; } catch { return "[]"; } })()));
+const keepSeen = () => { try { localStorage.setItem(KEY, JSON.stringify([...seen])); } catch {} };
+
+{
+  $("grid").innerHTML = R.map((r, i) => `
+    <button class="item${seen.has(r.code) ? " seen" : ""}" data-i="${i}">
+      <div class="cover"><img src="${IMG}${r.code}.jpg" alt="" loading="lazy">${r.x ? `<span class="badge">${r.x}</span>` : ""}<span class="tri"></span></div>
+      <p>${esc(r.line)}</p>
+    </button>`).join("");
+  $("grid").onclick = e => { const b = e.target.closest(".item"); if (b) open(+b.dataset.i); };
+  const n = new URLSearchParams(location.hash.slice(1)).get("v");
+  if (n !== null && R[n]) open(+n, false);
+}
+
+// One video element, its source swapped: a phone lets it keep its sound after the first tap.
+function show(i) {
+  at = (i + R.length) % R.length;
+  const r = R[at];
+  v.pause();
+  v.src = VID + r.code + ".mp4";
+  v.poster = IMG + r.code + ".jpg";
+  lastT = 0;
+  $("big").innerHTML = r.x ? `${r.x}<small>més visites que seguidors</small>` : "";
+  $("line").textContent = r.line;
+  $("count").textContent = `${at + 1} de ${R.length}`;
+  $("ig").href = r.url;
+  $("prog").style.width = "0";
+  history.replaceState(null, "", "#v=" + at);
+  seen.add(r.code); keepSeen();
+  document.querySelector(`.item[data-i="${at}"]`)?.classList.add("seen");
+  v.play().catch(() => $("viewer").classList.add("is-paused"));
+  const nx = R[(at + 1) % R.length]; new Image().src = IMG + nx.code + ".jpg";
+}
+function open(i, gesture = true) {
+  $("viewer").classList.add("on");
+  document.body.style.overflow = "hidden";
+  show(i);
+  if (gesture && i === 0) { $("hint").classList.add("show"); setTimeout(() => $("hint").classList.remove("show"), 2200); }
+}
+function close() {
+  v.pause(); $("viewer").classList.remove("on", "is-paused");
+  document.body.style.overflow = "";
+  history.replaceState(null, "", location.pathname);
+  document.querySelector(`.item[data-i="${at}"]`)?.scrollIntoView({block: "center"});
+}
+$("playAll").onclick = () => open(0);
+$("back").onclick = close;
+$("next").onclick = () => show(at + 1);
+$("prev").onclick = () => show(at - 1);
+// Only a video watched to its end moves on: a stray «ended» after a jump (seen in WebKit) leaves it where it is.
+v.onended = () => { if (v.duration && v.duration - lastT < 1.5) show(at + 1); };
+v.onplay = () => $("viewer").classList.remove("is-paused");
+v.onpause = () => $("viewer").classList.add("is-paused");
+v.ontimeupdate = () => { if (v.currentTime - lastT < 1.5) lastT = v.currentTime; if (v.duration) $("prog").style.width = (100 * v.currentTime / v.duration) + "%"; };
+v.onclick = () => v.paused ? v.play() : v.pause();
+document.querySelector(".paused").onclick = () => v.play();
+
+// Swipe up: the next one. Swipe down: the one before.
+let y0 = null, t0 = 0;
+$("viewer").addEventListener("touchstart", e => { y0 = e.touches[0].clientY; t0 = Date.now(); }, {passive: true});
+$("viewer").addEventListener("touchend", e => {
+  if (y0 === null) return;
+  const dy = e.changedTouches[0].clientY - y0; y0 = null;
+  if (Math.abs(dy) > 60 && Date.now() - t0 < 800) { e.preventDefault(); show(at + (dy < 0 ? 1 : -1)); }
+});
+document.addEventListener("keydown", e => {
+  if (!$("viewer").classList.contains("on")) return;
+  if (e.key === "ArrowDown" || e.key === "ArrowRight") show(at + 1);
+  else if (e.key === "ArrowUp" || e.key === "ArrowLeft") show(at - 1);
+  else if (e.key === "Escape") close();
+  else if (e.key === " ") { e.preventDefault(); v.paused ? v.play() : v.pause(); }
+});
+</script>
+</body>
+</html>
