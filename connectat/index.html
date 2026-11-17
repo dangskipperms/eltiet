@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>El Tiet · Connectat</title>
+<style>
+:root{--bg:#faf6ef;--fg:#1d1a17;--muted:#6b635a;--card:#fff;--red:#a8202a;--line:#eadfce}
+@media (prefers-color-scheme:dark){:root{--bg:#171412;--fg:#f2ece4;--muted:#a89d90;--card:#221e1b;--red:#e0525b;--line:#3a332d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.5 -apple-system,system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:40px 16px 60px;text-align:center}
+.logo{display:inline-grid;place-items:center;width:72px;height:72px;border-radius:50%;background:var(--red);color:#f6ead2;font:700 17px/1 Georgia,serif;letter-spacing:.04em}
+h1{font-size:28px;line-height:1.2;margin:16px 0 8px}
+p{margin:0 0 18px;color:var(--muted)}
+button{display:block;width:100%;border:0;border-radius:16px;background:var(--red);color:#fff;font:700 21px/1 -apple-system,system-ui,sans-serif;padding:22px 16px;margin:8px 0 14px}
+.code{word-break:break-all;font:13px/1.4 ui-monospace,Menlo,monospace;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--muted);text-align:left}
+.done{color:var(--fg);font-weight:600;min-height:1.5em}
+</style>
+</head>
+<body>
+<main>
+  <div class="logo">EL TIET</div>
+  <h1 id="title">Fet! Ja està connectat.</h1>
+  <p id="lead">Últim pas: toca el botó i envia'ns el codi per WhatsApp. Ara, abans d'una hora.</p>
+  <button id="send">Envia el codi</button>
+  <p class="done" id="done"></p>
+  <div class="code" id="code"></div>
+</main>
+<script>
+const q = new URLSearchParams(location.search);
+const code = q.get("code");
+const msg = "Codi El Tiet: " + location.href;
+const $ = id => document.getElementById(id);
+if (!code) {
+  $("title").textContent = "No s'ha connectat.";
+  $("lead").textContent = "Envia'ns una captura d'aquesta pantalla per WhatsApp i ho mirem.";
+  $("send").style.display = "none";
+  $("code").textContent = location.href;
+} else {
+  $("code").textContent = code;
+  $("send").onclick = async () => {
+    try { if (navigator.share) { await navigator.share({ text: msg }); $("done").textContent = "Enviat. Gràcies!"; return; } } catch (e) {}
+    try { await navigator.clipboard.writeText(msg); $("done").textContent = "Copiat. Enganxa'l al WhatsApp."; }
+    catch (e) { $("done").textContent = "Fes una captura d'aquesta pantalla i envia-la'ns."; }
+  };
+}
+</script>
+</body>
+</html>
